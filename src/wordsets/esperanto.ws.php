@@ -1,10 +1,12 @@
 <?php
 
-namespace MoneroIntegrations\MoneroPhp\mnemonic;
+declare(strict_types=1);
 
-class esperanto implements wordset {
+namespace MoneroIntegrations\MoneroCrypto\Mnemonic;
 
-class esperanto implements wordset
+use MoneroIntegrations\MoneroCrypto\Wordset;
+
+class esperanto implements Wordset
 {
     /* Returns name of wordset in the wordset's native language.
      * This is a human-readable string, and should be capitalized
@@ -18,7 +20,7 @@ class esperanto implements wordset
     /* Returns name of wordset in english.
      * This is a human-readable string, and should be capitalized
      */
-    public static function english_name(): string
+    public static function englishName(): string
     {
         return "Esperanto";
     }
@@ -30,7 +32,7 @@ class esperanto implements wordset
      * A value of 0 indicates that there is no unique prefix
      * and the entire word must be used instead.
      */
-    public static function prefix_length(): int
+    public static function prefixLength(): int
     {
         return 4;  // first 4 letters of each word in wordset is unique.
     }
