@@ -14,6 +14,9 @@ class Base58
     const ENCODED_BLOCK_SIZES = [0, 2, 3, 5, 6, 7, 9, 10, 11];
     const FULL_ENCODED_BLOCK_SIZE = 11;
 
+    /**
+     * Converts an array of unsigned 8-bit big-endian integers to a 64-bit unsigned integer.
+     */
     private static function uint8beTo64(array $data): string
     {
         $res = '0';
@@ -27,6 +30,9 @@ class Base58
         return $res;
     }
 
+    /**
+     * Encodes a block of data into Monero's Base58.
+     */
     private static function encodeBlock(array $data, array $res, int $res_offset): array
     {
         $length = count($data);
@@ -48,6 +54,9 @@ class Base58
         return $res;
     }
 
+    /**
+     * Encodes a hexadecimal string into Monero's Base58.
+     */
     public static function encode(string $hex): string
     {
         $data = str_split(hex2bin($hex));
