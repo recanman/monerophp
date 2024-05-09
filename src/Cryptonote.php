@@ -20,9 +20,12 @@
   OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
   SOFTWARE.
 */
-namespace MoneroIntegrations\MoneroPhp;
+
+namespace MoneroIntegrations\MoneroCrypto;
 
 use kornrunner\Keccak as keccak;
+use MoneroIntegrations\MoneroCrypto\Base58;
+
 use Exception;
 
 class Cryptonote
@@ -59,7 +62,6 @@ class Cryptonote
         }
 
         $this->ed25519 = new ed25519();
-        $this->base58 = new base58();
         $this->varint = new Varint();
     }
 
@@ -247,14 +249,14 @@ class Cryptonote
     {
         $data = $this->network_prefixes["STANDARD"] . $pSpendKey . $pViewKey;
         $checksum = $this->keccak_256($data);
-        $encoded  = $this->base58->encode($data . substr($checksum, 0, 8));
+        $encoded  = Base58::encode($data . substr($checksum, 0, 8));
 
         return $encoded;
     }
 
     public function verify_checksum($address)
     {
-        $decoded = $this->base58->decode($address);
+        $decoded = Base58::decode($address);
         $checksum = substr($decoded, -8);
         $checksum_hash = $this->keccak_256(substr($decoded, 0, -8));
         $calculated = substr($checksum_hash, 0, 8);
@@ -270,7 +272,7 @@ class Cryptonote
          */
     public function decode_address($address)
     {
-        $decoded = $this->base58->decode($address);
+        $decoded = Base58::decode($address);
 
         if(!$this->verify_checksum($address)) {
             throw new Exception("Error: invalid checksum");
@@ -297,7 +299,7 @@ class Cryptonote
     {
         $data = $this->network_prefixes["INTEGRATED"].$public_spendkey.$public_viewkey.$payment_id;
         $checksum = substr($this->keccak_256($data), 0, 8);
-        $result = $this->base58->encode($data.$checksum);
+        $result = Base58::encode($data.$checksum);
         return $result;
     }
 
@@ -350,7 +352,7 @@ class Cryptonote
         $subaddr_public_view_key = $this->generate_subaddr_view_public_key($subaddr_public_spend_key, $view_secret_key);
         $data = $this->network_prefixes["SUBADDRESS"] . $subaddr_public_spend_key . $subaddr_public_view_key;
         $checksum = $this->keccak_256($data);
-        $encoded = $this->base58->encode($data . substr($checksum, 0, 8));
+        $encoded = Base58::encode($data . substr($checksum, 0, 8));
         return $encoded;
     }
 
