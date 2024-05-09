@@ -15,10 +15,8 @@ class Base58Test extends TestCase
         $this->assertSame($this->testEncoded, Base58::encode($this->testDecoded));
     }
 
-    //TODO: fix this test
     public function testDecode()
     {
-        $this->assertSame(1, 1);
-        //$this->assertSame($this->testDecoded, Base58::decode($this->testEncoded));
+        $this->assertSame($this->testDecoded, Base58::decode($this->testEncoded));
     }
 }
