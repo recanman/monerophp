@@ -44,7 +44,7 @@
         "laravel/pint": "^1.10.3"
     },
     "suggest": {
-        "ext-gmp": "Used to have a multiple math precision for generating address"
+        "ext-gmp": "For much faster elliptic curve operations, install the GMP extension."
     },
     "autoload": {
         "psr-4": {
