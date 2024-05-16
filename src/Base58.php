@@ -126,7 +126,7 @@ class Base58
     }
 
     /**
-     * Decodes a Monero's Base58 string into a hexadecimal string.
+     * Decodes a string in Monero's Base58 to a hexadecimal string.
      */
     public static function decode(string $base58): string
     {
