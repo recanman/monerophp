@@ -4,7 +4,7 @@
     "keywords": ["Monero", "XMR", "cryptonote", "cryptocurrency", "crypto", "cryptography"],
     "homepage": "https://github.com/monero-integrations/monerophp",
     "type": "library",
-    "version" : "1.0.4",
+    "version" : "1.0.5",
     "license": "MIT",
     "authors": [
         {
