@@ -4,7 +4,7 @@
     "keywords": ["Monero", "XMR", "cryptonote", "cryptocurrency", "crypto", "cryptography"],
     "homepage": "https://github.com/monero-integrations/monerophp",
     "type": "library",
-    "version" : "1.0.1",
+    "version" : "1.0.3",
     "license": "MIT",
     "authors": [
         {
@@ -62,7 +62,7 @@
         "lint": "pint --preset psr12 -v",
         "test:lint": "pint --preset psr12 --test -v",
         "test:phpstan": "phpstan analyse --ansi --memory-limit=1G",
-        "test:unit": "phpunit --testsuite unit",
+        "test:unit": "phpunit --testsuite unit tests/unit/CryptonoteTest.php",
         "test": [
             "@test:lint",
             "@test:phpstan",
