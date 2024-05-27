@@ -89,6 +89,8 @@ class BCMATH_BigIntegerTest extends TestCase
         $this->assertEquals((new BigInteger(81))->testbit(7), false);
         $this->assertEquals((new BigInteger(258))->testbit(8), true);
         $this->assertEquals((new BigInteger(253))->testbit(8), false);
+        $this->assertEquals((new BigInteger(20))->shiftLeft(3)->toString(), "160");
+        $this->assertEquals((new BigInteger(20))->shiftRight(3)->toString(), "2");
         $this->assertEquals((new BigInteger(20))->scan0(2), 3);
         $this->assertEquals((new BigInteger(20))->scan1(3), 4);
         $this->assertEquals((new BigInteger(20))->cmp(22), -1);
