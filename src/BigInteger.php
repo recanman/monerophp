@@ -148,59 +148,59 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return gmp_intval($this->value);
         }
 
-        public function add(int $x): BigInteger
+        public function add(mixed $x): BigInteger
         {
             return new BigInteger(gmp_add($this->value, BigInteger::getGmp($x)), true);
         }
 
-        public function sub(int $x): BigInteger
+        public function sub(mixed $x): BigInteger
         {
             return new BigInteger(gmp_sub($this->value, BigInteger::getGmp($x)), true);
         }
 
-        public function mul(int $x): BigInteger
+        public function mul(mixed $x): BigInteger
         {
             return new BigInteger(gmp_mul($this->value, BigInteger::getGmp($x)), true);
         }
 
-        public function div(int $x): BigInteger
+        public function div(mixed $x): BigInteger
         {
             return new BigInteger(gmp_div_q($this->value, BigInteger::getGmp($x)), true);
         }
 
-        public function divR(int $x): BigInteger
+        public function divR(mixed $x): BigInteger
         {
             return new BigInteger(gmp_div_r($this->value, BigInteger::getGmp($x)), true);
         }
 
-        public function divQR(int $x): array
+        public function divQR(mixed $x): array
         {
             $res = gmp_div_qr($this->value, BigInteger::getGmp($x));
             return [new BigInteger($res[0], true), new BigInteger($res[1], true)];
         }
 
-        public function mod(int $x): BigInteger
+        public function mod(mixed $x): BigInteger
         {
             return new BigInteger(gmp_mod($this->value, BigInteger::getGmp($x)), true);
         }
 
-        public function gcd(int $x): BigInteger
+        public function gcd(mixed $x): BigInteger
         {
             return new BigInteger(gmp_gcd($this->value, BigInteger::getGmp($x)), true);
         }
 
-        public function modInverse(int $x): BigInteger|bool
+        public function modInverse(mixed $x): BigInteger|bool
         {
             $res = gmp_invert($this->value, BigInteger::getGmp($x));
             return $res === false ? false : new BigInteger($res, true);
         }
 
-        public function pow(int $x): BigInteger
+        public function pow(mixed $x): BigInteger
         {
             return new BigInteger(gmp_pow($this->value, (new BigInteger($x))->toNumber()), true);
         }
 
-        public function powMod(int $x, int $n): BigInteger
+        public function powMod(mixed $x, mixed $n): BigInteger
         {
             return new BigInteger(gmp_powm($this->value, BigInteger::getGmp($x), BigInteger::getGmp($n)), true);
         }
@@ -215,17 +215,17 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return new BigInteger(gmp_neg($this->value), true);
         }
 
-        public function binaryAnd(int $x): BigInteger
+        public function binaryAnd(mixed $x): BigInteger
         {
             return new BigInteger(gmp_and($this->value, BigInteger::getGmp($x)), true);
         }
 
-        public function binaryOr(int $x): BigInteger
+        public function binaryOr(mixed $x): BigInteger
         {
             return new BigInteger(gmp_or($this->value, BigInteger::getGmp($x)), true);
         }
 
-        public function binaryXor(int $x): BigInteger
+        public function binaryXor(mixed $x): BigInteger
         {
             return new BigInteger(gmp_xor($this->value, BigInteger::getGmp($x)), true);
         }
@@ -252,12 +252,12 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return gmp_scan1($this->value, $start);
         }
 
-        public function cmp(int $x): int
+        public function cmp(mixed $x): int
         {
             return gmp_cmp($this->value, BigInteger::getGmp($x));
         }
 
-        public function equals(int $x): bool
+        public function equals(mixed $x): bool
         {
             return $this->cmp($x) === 0;
         }
@@ -489,32 +489,32 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return intval($this->value);
         }
 
-        public function add(int $x): BigInteger
+        public function add(mixed $x): BigInteger
         {
             return new BigInteger(bcadd($this->value, BigInteger::getBC($x), 0), true);
         }
 
-        public function sub(int $x): BigInteger
+        public function sub(mixed $x): BigInteger
         {
             return new BigInteger(bcsub($this->value, BigInteger::getBC($x), 0), true);
         }
 
-        public function mul(int $x): BigInteger
+        public function mul(mixed $x): BigInteger
         {
             return new BigInteger(bcmul($this->value, BigInteger::getBC($x), 0), true);
         }
 
-        public function div(int $x): BigInteger
+        public function div(mixed $x): BigInteger
         {
             return new BigInteger(bcdiv($this->value, BigInteger::getBC($x), 0), true);
         }
 
-        public function divR(int $x): BigInteger
+        public function divR(mixed $x): BigInteger
         {
             return new BigInteger(bcmod($this->value, BigInteger::getBC($x)), true);
         }
 
-        public function divQR(int $x): array
+        public function divQR(mixed $x): array
         {
             return [
                 $this->div($x),
@@ -522,7 +522,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             ];
         }
 
-        public function mod(int $x): BigInteger
+        public function mod(mixed $x): BigInteger
         {
             $xv = BigInteger::getBC($x);
             $mod = bcmod($this->value, $xv);
@@ -532,7 +532,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return new BigInteger($mod, true);
         }
 
-        public function extendedGcd(int $n): array
+        public function extendedGcd(mixed $n): array
         {
             $u = $this->value;
             $v = (new BigInteger($n))->abs()->value;
@@ -565,12 +565,12 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             ];
         }
 
-        public function gcd(int $x): BigInteger
+        public function gcd(mixed $x): BigInteger
         {
             return $this->extendedGcd($x)["gcd"];
         }
 
-        public function modInverse(int $n): BigInteger|bool
+        public function modInverse(mixed $n): BigInteger|bool
         {
             $original = $n;
             $n = (new BigInteger($n))->abs();
@@ -592,12 +592,12 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return $this->sign() < 0 ? $n->sub($x) : $x;
         }
 
-        public function pow(int $x): BigInteger
+        public function pow(mixed $x): BigInteger
         {
             return new BigInteger(bcpow($this->value, BigInteger::getBC($x), 0), true);
         }
 
-        public function powMod(int $x, int $n): BigInteger
+        public function powMod(mixed $x, mixed $n): BigInteger
         {
             return new BigInteger(bcpowmod($this->value, BigInteger::getBC($x), BigInteger::getBC($n), 0), true);
         }
@@ -612,7 +612,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return new BigInteger($this->value[0] == "-" ? substr($this->value, 1) : "-" . $this->value, true);
         }
 
-        public function binaryAnd(int $x): BigInteger
+        public function binaryAnd(mixed $x): BigInteger
         {
             $left = $this->toBytes();
             $right = (new BigInteger($x))->toBytes();
@@ -625,7 +625,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return new BigInteger($left & $right, 256);
         }
 
-        public function binaryOr(int $x): BigInteger
+        public function binaryOr(mixed $x): BigInteger
         {
             $left = $this->toBytes();
             $right = (new BigInteger($x))->toBytes();
@@ -638,7 +638,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return new BigInteger($left | $right, 256);
         }
 
-        public function binaryXor(int $x): BigInteger
+        public function binaryXor(mixed $x): BigInteger
         {
             $left = $this->toBytes();
             $right = (new BigInteger($x))->toBytes();
@@ -690,12 +690,12 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return $pos === false ? -1 : $len - $pos - 1;
         }
 
-        public function cmp(int $x): int
+        public function cmp(mixed $x): int
         {
             return bccomp($this->value, BigInteger::getBC($x));
         }
 
-        public function equals(int $x): bool
+        public function equals(mixed $x): bool
         {
             return $this->value === BigInteger::getBC($x);
         }
