@@ -63,6 +63,8 @@ class GMP_BigIntegerTest extends TestCase
         $this->assertEquals((new BigInteger(20))->mul(12)->toString(), "240");
         $this->assertEquals((new BigInteger(20))->div(4)->toString(), "5");
         $this->assertEquals((new BigInteger(20))->divR(7)->toString(), "6");
+        $this->assertEquals((new BigInteger(20))->shiftLeft(3)->toString(), "160");
+        $this->assertEquals((new BigInteger(20))->shiftRight(3)->toString(), "2");
 
         $qr = (new BigInteger(20))->divQR(6);
         $this->assertEquals($qr[0]->toString(), "3");

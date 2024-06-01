@@ -266,6 +266,22 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
         {
             return gmp_sign($this->value);
         }
+
+        public function shiftLeft(int $n): BigInteger
+        {
+            return $this->mul((new static(2))->pow($n));
+        }
+
+        public function shiftRight(int $n): BigInteger
+        {
+            $newInt = $this->div((new static(2))->pow($n));
+
+            if ($newInt->add($n)->cmp(0) < 0) {
+                return $newInt->sub(1);
+            }
+
+            return $newInt;
+        }
     }
 } elseif (S_MATH_BIGINTEGER_MODE == "bcmath") {
 
@@ -703,6 +719,22 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
         public function sign(): int
         {
             return $this->value[0] === "-" ? -1 : ($this->value === "0" ? 0 : 1);
+        }
+
+        public function shiftLeft(int $n): BigInteger
+        {
+            return $this->mul((new static(2))->pow($n));
+        }
+
+        public function shiftRight(int $n): BigInteger
+        {
+            $newInt = $this->div((new static(2))->pow($n));
+
+            if ($newInt->add($n)->cmp(0) < 0) {
+                return $newInt->sub(1);
+            }
+
+            return $newInt;
         }
     }
 } else {
