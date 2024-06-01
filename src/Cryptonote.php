@@ -38,39 +38,35 @@ enum MoneroNetwork: string
 
 class Cryptonote
 {
+    public static $all_network_prefixes = [
+        "mainnet" => [
+            "STANDARD" => "12", // dechex(18)
+            "INTEGRATED" => "13", // dechex(19)
+            "SUBADDRESS" => "2A" // dechex(42)
+        ],
+        "stagenet" => [
+            "STANDARD" => "18", // dechex(24)
+            "INTEGRATED" => "19", // dechex(25)
+            "SUBADDRESS" => "24", // dechex(36)
+        ],
+        "testnet" => [
+            "STANDARD" => "35", // dechex(53)
+            "INTEGRATED" => "36", // dechex(54)
+            "SUBADDRESS" => "3F", // dechex(63)
+        ]
+    ];
+    protected $network_prefixes;
+
     // https://github.com/monero-project/monero/blob/master/src/cryptonote_config.h#L222
     private $network_prefixes;
     protected $ed25519;
     protected $base58;
     protected $varint;
 
-    public function __construct($network = "mainnet")
+    public function __construct(MoneroNetwork $network)
     {
-        $networks_prefixes = [
-            "mainnet" => [
-                "STANDARD" => dechex(18),
-                "INTEGRATED" => dechex(19),
-                "SUBADDRESS" => dechex(42),
-            ],
-            "stagenet" => [
-                "STANDARD" => dechex(24),
-                "INTEGRATED" => dechex(25),
-                "SUBADDRESS" => dechex(36),
-            ],
-            "testnet" => [
-                "STANDARD" => dechex(53),
-                "INTEGRATED" => dechex(54),
-                "SUBADDRESS" => dechex(63),
-            ]
-        ];
-        if (array_key_exists($network, $networks_prefixes)) {
-            $this->network_prefixes = $networks_prefixes[$network];
-        } else {
-            throw new Exception("Error: Invalid Network, should be one of " . join(", ", array_keys($networks_prefixes)));
-        }
-
-        $this->ed25519 = new ed25519();
-        $this->varint = new Varint();
+        $this->network_prefixes = self::$all_network_prefixes[$network->value];
+        $this->ed25519 = new Ed25519();
     }
 
     /*
