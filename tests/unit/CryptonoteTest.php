@@ -24,6 +24,7 @@ class CryptonoteTest extends TestCase
 	private $testPaymentId = "ef64f0a81b022a81";
 	private $testIntegratedAddress = "4FowJQLEWXKJMDwegvhEJAYbFAyZ6Y2GqCXgebZd96CDShSESH5nCKEfaaER1vCYKTA7BQkyE5gBGeqRRcX8Fe1cHDPkStRLntqFZqGwKS";
 
+	/** @var Cryptonote */
 	private $cr;
 
 	public function setUp(): void
