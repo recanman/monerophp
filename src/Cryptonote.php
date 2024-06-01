@@ -1,4 +1,6 @@
 <?php
+
+declare(strict_types=1);
 /*
   Copyright (c) 2018, Monero Integrations
 
@@ -24,9 +26,15 @@
 namespace MoneroIntegrations\MoneroCrypto;
 
 use kornrunner\Keccak as keccak;
-use MoneroIntegrations\MoneroCrypto\Base58;
 
 use Exception;
+
+enum MoneroNetwork: string
+{
+    case mainnet = "mainnet";
+    case stagenet = "stagenet";
+    case testnet = "testnet";
+}
 
 class Cryptonote
 {
