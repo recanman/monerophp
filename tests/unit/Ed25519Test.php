@@ -22,7 +22,8 @@ class Ed25519Test extends TestCase
 	private $testHintInput = "100";
 	private $testHintOutput = "5249739319241077611146023738646316455244634195485061850472191081926985295157468499557719456094638265400023549952640721037286035956983479601959945106531843";
 
-	private $testEncodedB = "005866666666666666666666666666666666666666666666666666666666666666";
+	private $testEncodedB = "5866666666666666666666666666666666666666666666666666666666666666";
+	private $testBitInput = "fffffffffffffffffffffffffffffffX";
 
 	protected function setUp(): void
 	{
@@ -85,6 +86,15 @@ class Ed25519Test extends TestCase
 		$this->assertEquals($this->testEncodedB, $result);
 	}
 
+	public function testBit(): void
+	{
+		$result = $this->ed25519->bit($this->testBitInput, new BigInteger(255));
+		$this->assertEquals(0, $result);
+
+		$result = $this->ed25519->bit($this->testBitInput, new BigInteger(254));
+		$this->assertEquals(1, $result);
+	}
+
 	public function testHint(): void
 	{
 		$result = $this->ed25519->Hint(new BigInteger($this->testHintInput));
@@ -107,4 +117,12 @@ class Ed25519Test extends TestCase
 		$this->assertEquals('100', $point->toString());
 	}
 
+	public function testDecodePoint(): void
+	{
+		$point = $this->ed25519->decodepoint($this->testEncodedB);
+		$this->assertEquals($this->ed25519->B, $point);
+
+		$this->expectException(TypeError::class);
+		$point = $this->ed25519->decodepoint("invalid");
+	}
 }

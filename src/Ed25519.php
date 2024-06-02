@@ -213,6 +213,14 @@ class Ed25519
     }
 
     /**
+     * Returns the bit at position i of the hash h.
+     */
+    public function bit(string $h, BigInteger $i): int
+    {
+        return (ord($h[(int) $i->div(8)]) >> $i->mod(8)->toDec()) & 1;
+    }
+
+    /**
      * Returns the decimal representation of the input's hash (SHA-512).
      */
     public function Hint(mixed $m, bool $asBigInt = false): BigInteger|string
@@ -241,6 +249,30 @@ class Ed25519
     {
         $result = new BigInteger(bin2hex($s), 16);
         return new BigInteger($result->toDec());
+    }
+
+    /**
+     * Decodes a point on the Edwards25519 curve from a hexadecimal string.
+     */
+    public function decodepoint(string $encoded): Point
+    {
+        // Convert to little-endian
+        $encoded = strrev(hex2bin($encoded));
+
+        $y = $this->decodeint($encoded);
+        $x = $this->xrecover($y);
+
+        if ($x->binaryAnd(new BigInteger("1"))->cmp($this->bit($encoded, $this->b->sub(1))) != 0) {
+            $x = $this->q->sub($x);
+        }
+
+        $P = new Point($x, $y);
+
+        if (!$this->isoncurve($P)) {
+            throw new Exception("Decoding point that is not on curve");
+        }
+
+        return $P;
     }
     // The code below is by the Monero-Integrations team
 
