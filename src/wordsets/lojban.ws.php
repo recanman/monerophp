@@ -8,7 +8,8 @@ use MoneroIntegrations\MoneroCrypto\Wordset;
 
 class lojban implements Wordset
 {
-    /* Returns name of wordset in the wordset's native language.
+    /**
+     * Returns name of wordset in the wordset's native language.
      * This is a human-readable string, and should be capitalized
      * if the language supports it.
      */
@@ -17,7 +18,8 @@ class lojban implements Wordset
         return "Lojban";
     }
 
-    /* Returns name of wordset in english.
+    /**
+     * Returns name of wordset in English.
      * This is a human-readable string, and should be capitalized
      */
     public static function englishName(): string
@@ -25,7 +27,8 @@ class lojban implements Wordset
         return "Lojban";
     }
 
-    /* Returns integer indicating length of unique prefix,
+    /**
+     * Returns integer indicating length of unique prefix,
      * such that each prefix of this length is unique across
      * the entire set of words.
      *
@@ -37,7 +40,9 @@ class lojban implements Wordset
         return 4;  // first 4 letters of each word in wordset is unique.
     }
 
-    /* Returns an array of all words in the wordset.
+    /**
+     * Returns an array of all words in the wordset.
+     * @return array<string>
      */
     public static function words(): array
     {
