@@ -40,6 +40,7 @@ class Mnemonic
 {
     /**
      * Given a mnemonic seed word list, return the seed checksum.
+     * @param array<string> $words
      */
     public static function checksum(array $words, int $prefix_len): string
     {
@@ -58,6 +59,7 @@ class Mnemonic
 
     /**
      * Given a mnemonic seed word list, check if checksum word is valid.
+     * @param array<string> $words
      */
     public static function validateChecksum(array $words, int $prefix_len): bool
     {
@@ -81,6 +83,8 @@ class Mnemonic
      * @todo if anyone can make this work reliably with
      * pure PHP math (no gmp or bcmath), please submit a
      * pull request.
+     * 
+     * @return array<string>
      */
     public static function encode(string $seed, ?string $wordset_name = null): array
     {
@@ -108,6 +112,8 @@ class Mnemonic
      * Given a hexadecimal key string (seed),
      * return it's mnemonic representation plus an
      * extra checksum word.
+     * 
+     * @return array<string>
      */
     public static function encodeWithChecksum(string $message, ?string $wordset_name = null): array
     {
@@ -124,6 +130,8 @@ class Mnemonic
      * @todo if anyone can make this work reliably with
      * pure PHP math (no gmp or bcmath), please submit a
      * pull request.
+     * 
+     * @param array<string> $wlist
      */
     public static function decode(array $wlist, ?string $wordset_name = null): string
     {
@@ -165,6 +173,9 @@ class Mnemonic
 
     /**
      * Given a wordset identifier, returns the full wordset
+     * 
+     * @param string|null $name
+     * 
      */
     public static function getWordsetByName(?string $name = null): array
     {
@@ -183,6 +194,8 @@ class Mnemonic
      *
      * throws an exception if more than one wordset matches all words,
      * but in theory that should never happen.
+     * 
+     * @param array<string> $mnemonic
      */
     public static function findWordsetByMnemonic(array $mnemonic): ?string
     {
@@ -213,6 +226,7 @@ class Mnemonic
 
     /**
      * Return a list of available wordsets.
+     * @return array<string>
      */
     public static function getWordsetList(): array
     {
@@ -221,6 +235,7 @@ class Mnemonic
 
     /**
      * Return a list of available wordsets with details.
+     * @return array<string, array<string, string|int|array<string>>>
      */
     public static function getWordsets(): array
     {
@@ -275,5 +290,9 @@ interface Wordset
     public static function name(): string;
     public static function englishName(): string;
     public static function prefixLength(): int;
+
+    /**
+     * @return array<string>
+     */
     public static function words(): array;
 }

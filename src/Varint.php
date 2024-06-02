@@ -32,6 +32,7 @@ class Varint
 {
     /**
      * Encodes an integer into a varint format.
+     * @return array<int> The encoded varint.
      */
     public static function encodeVarint(int $value): array
     {
@@ -51,6 +52,7 @@ class Varint
 
     /**
      * Decodes a varint from a hexadecimal string.
+     * @param array<int> $data The data to decode.
      */
     public static function decodeVarint(array $data): int
     {

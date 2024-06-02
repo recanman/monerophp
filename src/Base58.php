@@ -16,6 +16,7 @@ class Base58
 
     /**
      * Converts an array of unsigned 8-bit big-endian integers to a 64-bit unsigned integer.
+     * @param array<int, string> $data
      */
     private static function uint8beTo64(array $data): BigInteger
     {
@@ -46,6 +47,11 @@ class Base58
 
     /**
      * Encodes a block of data into Monero's Base58.
+     * @param array<int, string> $data
+     * @param array<int, string> $res
+     * @param int $res_offset
+     * 
+     * @return array<int, string>
      */
     private static function encodeBlock(array $data, array $res, int $res_offset): array
     {
@@ -61,7 +67,7 @@ class Base58
         while (!$num->equals(0)) {
             $remainder = $num->mod(self::ALPHABET_SIZE);
             $num = $num->div(self::ALPHABET_SIZE);
-            $res[$res_offset + $i] = self::ALPHABET[$remainder->toDec()];
+            $res[$res_offset + $i] = self::ALPHABET[$remainder->toNumber()];
             $i--;
         }
 
@@ -99,6 +105,10 @@ class Base58
 
     /**
      * Decodes a block of data from Monero's Base58.
+     * @param array<int, string> $data
+     * @param array<int, string> $res
+     * 
+     * @return array<int, string>
      */
     private static function decodeBlock(array $data, array $res): array
     {
@@ -142,11 +152,11 @@ class Base58
 
         $res = [];
         for ($i = 0; $i < $full_block_count; $i++) {
-            $res = self::decodeBlock(array_slice($data, $i * self::FULL_ENCODED_BLOCK_SIZE, self::FULL_ENCODED_BLOCK_SIZE), $res, $i * self::BLOCK_SIZE);
+            $res = self::decodeBlock(array_slice($data, $i * self::FULL_ENCODED_BLOCK_SIZE, self::FULL_ENCODED_BLOCK_SIZE), $res);
         }
 
         if ($last_block_size > 0) {
-            $res = self::decodeBlock(array_slice($data, $full_block_count * self::FULL_ENCODED_BLOCK_SIZE, $last_block_size), $res, $full_block_count * self::BLOCK_SIZE);
+            $res = self::decodeBlock(array_slice($data, $full_block_count * self::FULL_ENCODED_BLOCK_SIZE, $last_block_size), $res);
         }
 
         return bin2hex(implode('', $res));

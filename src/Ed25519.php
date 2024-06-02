@@ -44,7 +44,18 @@ use Exception;
  */
 class Point
 {
+    /**
+     * The x-coordinate of the point.
+     *
+     * @var BigInteger
+     */
     public $x;
+
+    /**
+     * The y-coordinate of the point.
+     *
+     * @var BigInteger
+     */
     public $y;
 
     public function __construct(BigInteger $x, BigInteger $y)
@@ -58,7 +69,10 @@ class Point
         return "x: " . $this->x . ", y: " . $this->y;
     }
 
-    public function equals(Point $point)
+    /**
+     * Determines if two points are equal.
+     */
+    public function equals(Point $point): bool
     {
         return $this->x->equals($point->x) && $this->y->equals($point->y);
     }
@@ -66,13 +80,19 @@ class Point
 
 class Ed25519
 {
+    /** @var BigInteger */
     public $b;
+    /** @var BigInteger */
     public $q;
+    /** @var BigInteger */
     public $l;
+    /** @var BigInteger */
     public $d;
+    /** @var BigInteger */
     public $I;
+    /** @var Point */
     public $B;
-
+    /** @var Point */
     public $identityPoint;
 
     public function __construct()

@@ -21,22 +21,23 @@ if (!defined("S_MATH_BIGINTEGER_MODE")) {
     }
 }
 
+// @phpstan-ignore-next-line
 if (S_MATH_BIGINTEGER_MODE == "gmp") {
 
     if (!extension_loaded("gmp")) {
         throw new \ValueError("Extension gmp not loaded");
     }
 
-    class BigInteger
+    final class BigInteger
     {
-        public $value;
+        public \GMP|string $value;
 
-        public function __construct($value = 0, $base = 10)
+        public function __construct(mixed $value = 0, mixed $base = 10)
         {
             $this->value = $base === true ? $value : BigInteger::getGmp($value, $base);
         }
 
-        public static function createSafe($value = 0, $base = 10): BigInteger|bool
+        public static function createSafe(mixed $value = 0, mixed $base = 10): BigInteger|bool
         {
             try {
                 return new BigInteger($value, $base);
@@ -45,7 +46,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             }
         }
 
-        public static function isGmp($var): bool
+        public static function isGmp(mixed $var): bool
         {
             if (is_resource($var)) {
                 return get_resource_type($var) == "GMP integer";
@@ -56,7 +57,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return false;
         }
 
-        public static function getGmp(mixed $value = 0, $base = 10): \GMP
+        public static function getGmp(mixed $value = 0, int $base = 10): \GMP
         {
             if ($value instanceof BigInteger) {
                 return $value->value;
@@ -67,6 +68,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             $type = gettype($value);
             if ($type == "integer") {
                 $gmp = gmp_init($value);
+                // @phpstan-ignore-next-line
                 if ($gmp === false) {
                     throw new \ValueError("Cannot initialize");
                 }
@@ -84,6 +86,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
                 error_reporting(0);
                 $gmp = gmp_init($value, $base);
                 error_reporting($level);
+                // @phpstan-ignore-next-line
                 if ($gmp === false) {
                     throw new \ValueError("Cannot initialize");
                 }
@@ -121,7 +124,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return gmp_strval($this->value, 2);
         }
 
-        public function toString($base = 10): string
+        public function toString(int $base = 10): string
         {
             if ($base == 2) {
                 return $this->toBits();
@@ -173,6 +176,9 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return new BigInteger(gmp_div_r($this->value, BigInteger::getGmp($x)), true);
         }
 
+        /**
+         * @return array{0: BigInteger, 1: BigInteger}
+         */
         public function divQR(mixed $x): array
         {
             $res = gmp_div_qr($this->value, BigInteger::getGmp($x));
@@ -230,7 +236,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return new BigInteger(gmp_xor($this->value, BigInteger::getGmp($x)), true);
         }
 
-        public function setbit(int $index, $bitOn = true)
+        public function setbit(int $index, bool $bitOn = true): BigInteger
         {
             $cpy = gmp_init(gmp_strval($this->value, 16), 16);
             gmp_setbit($cpy, $index, $bitOn);
@@ -289,17 +295,17 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
         throw new \ValueError("Extension bcmath not loaded");
     }
 
-    class BigInteger
+    final class BigInteger
     {
-        public static $chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuv";
-        public $value;
+        public static string $chars = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuv";
+        public string $value;
 
-        public function __construct($value = 0, $base = 10)
+        public function __construct(mixed $value = 0, mixed $base = 10)
         {
             $this->value = $base === true ? $value : BigInteger::getBC($value, $base);
         }
 
-        public static function createSafe($value = 0, $base = 10)
+        public static function createSafe(mixed $value = 0, mixed $base = 10): BigInteger|bool
         {
             try {
                 return new BigInteger($value, $base);
@@ -344,7 +350,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return true;
         }
 
-        public static function getBC(mixed $value = 0, $base = 10)
+        public static function getBC(mixed $value = 0, int $base = 10): string
         {
             if ($value instanceof BigInteger) {
                 return $value->value;
@@ -459,6 +465,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
 
             while (bccomp($current, '0', 0) > 0) {
                 $v = bcmod($current, $base);
+                // @phpstan-ignore-next-line
                 $value = BigInteger::$chars[$v] . $value;
                 $current = bcdiv($current, $base, 0);
             }
@@ -478,7 +485,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return strlen($res) == 0 ? "0" : $res;
         }
 
-        public function toString($base = 10): string
+        public function toString(int $base = 10): string
         {
             if ($base == 2) {
                 return $this->toBits();
@@ -530,6 +537,9 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return new BigInteger(bcmod($this->value, BigInteger::getBC($x)), true);
         }
 
+        /**
+         * @return array{0: BigInteger, 1: BigInteger}
+         */
         public function divQR(mixed $x): array
         {
             return [
@@ -548,6 +558,9 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return new BigInteger($mod, true);
         }
 
+        /**
+         * @return array{gcd: BigInteger, x: BigInteger, y: BigInteger}
+         */
         public function extendedGcd(mixed $n): array
         {
             $u = $this->value;
@@ -597,7 +610,8 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
                 return $n->sub($temp->value);
             }
 
-            extract($this->extendedGcd($original));
+            $ex = $this->extendedGcd($original);
+            extract($ex);
 
             if (!$gcd->equals(1)) {
                 return false;
@@ -605,6 +619,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
 
             $x = $x->sign() < 0 ? $x->add($original) : $x;
 
+            // @phpstan-ignore-next-line
             return $this->sign() < 0 ? $n->sub($x) : $x;
         }
 
@@ -667,7 +682,7 @@ if (S_MATH_BIGINTEGER_MODE == "gmp") {
             return new BigInteger($left ^ $right, 256);
         }
 
-        public function setbit(int $index, $bitOn = true): BigInteger
+        public function setbit(int $index, bool $bitOn = true): BigInteger
         {
             $bits = $this->toBits();
             $bits[strlen($bits) - $index - 1] = $bitOn ? "1" : "0";
