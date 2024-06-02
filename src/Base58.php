@@ -100,7 +100,7 @@ class Base58
     /**
      * Decodes a block of data from Monero's Base58.
      */
-    private static function decodeBlock(array $data, array $res, int $res_offset): array
+    private static function decodeBlock(array $data, array $res): array
     {
         $length = count($data);
 
