@@ -196,6 +196,21 @@ class Ed25519
         return $y->toBytes();
     }
 
+    /**
+     * Encodes a point on the Edwards25519 curve to a hexadecimal string.
+     */
+    public function encodePoint(Point $P): string
+    {
+        $x = $P->x;
+        $y = $P->y;
+
+        $result = $y->toBytes();
+        $result .= $x->binaryAnd(new BigInteger("1"))->toBytes();
+
+        // Convert to little-endian
+        $result = strrev($result);
+        return bin2hex($result);
+    }
 
     /**
      * Returns the decimal representation of the input's hash (SHA-512).

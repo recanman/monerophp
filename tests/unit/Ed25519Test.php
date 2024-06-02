@@ -22,6 +22,8 @@ class Ed25519Test extends TestCase
 	private $testHintInput = "100";
 	private $testHintOutput = "5249739319241077611146023738646316455244634195485061850472191081926985295157468499557719456094638265400023549952640721037286035956983479601959945106531843";
 
+	private $testEncodedB = "005866666666666666666666666666666666666666666666666666666666666666";
+
 	protected function setUp(): void
 	{
 		$this->ed25519 = new Ed25519();
@@ -67,6 +69,14 @@ class Ed25519Test extends TestCase
 	{
 		$result = $this->ed25519->encodeint(new BigInteger(100));
 		$this->assertEquals(hex2bin('64'), $result);
+	}
+
+	public function testEncodePoint(): void
+	{
+		$point = $this->ed25519->B;
+		$result = $this->ed25519->encodepoint($point);
+
+		$this->assertEquals($this->testEncodedB, $result);
 	}
 
 	public function testHint(): void
