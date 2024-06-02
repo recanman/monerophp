@@ -35,6 +35,12 @@ class Ed25519Test extends TestCase
 		$point = new Point(new BigInteger(1), new BigInteger(2));
 		$this->assertEquals('1', $point->x->toString());
 		$this->assertEquals('2', $point->y->toString());
+
+		$point2 = new Point(new BigInteger(2), new BigInteger(1));
+		$this->assertEquals('2', $point2->x->toString());
+		$this->assertEquals('1', $point2->y->toString());
+
+		$this->assertNotEquals($point, $point2);
 	}
 
 	public function testH(): void
