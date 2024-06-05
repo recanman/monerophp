@@ -245,7 +245,7 @@ class Ed25519
      */
     public function bit(string $h, BigInteger $i): int
     {
-        return (ord($h[(int) $i->div(8)]) >> $i->mod(8)->toDec()) & 1;
+        return (ord($h[$i->div(8)->toNumber()]) >> $i->mod(8)->toNumber()) & 1;
     }
 
     /**
