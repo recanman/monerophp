@@ -51,11 +51,11 @@ class CryptonoteTest extends TestCase
 	// 	$this->assertEquals($this->testPrivateViewKey, $result);
 	// }
 
-	// public function testPkFromSk(): void
-	// {
-	// 	$result = $this->cr->pk_from_sk($this->testPrivateSpendKey);
-	// 	$this->assertEquals($this->testPubSpendKey, $result);
-	// }
+    public function testScReduce(): void
+    {
+        $result = $this->cr->sc_reduce("65");
+        $this->assertEquals("65", $result);
+    }
 
 	public function testEncodeAddress(): void
 	{
