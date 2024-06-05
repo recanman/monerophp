@@ -25,6 +25,9 @@ class Ed25519Test extends TestCase
     private $testEncodedB = "5866666666666666666666666666666666666666666666666666666666666666";
     private $testBitInput = "fffffffffffffffffffffffffffffffX";
 
+    private $testPublicKeyInput = "92109952688507622152061303160978719049325098095664035905533631729165308545803";
+    private $testPublicKeyOutput = "22b93c70919f3bb0023e2dd172db4b0d1ed9980fa1edf8cfdd39181047f66639";
+
     private $testEdwardsOutput = "c9a3f86aae465f0e56513864510f3997561fa2c9e85ea21dc2292309f3cd6022";
 
     protected function setUp(): void
@@ -95,6 +98,14 @@ class Ed25519Test extends TestCase
 
         $result = $this->ed25519->scalarmult($this->ed25519->B, new BigInteger(2));
         $this->assertEquals($this->ed25519->edwards($this->ed25519->B, $this->ed25519->B), $result);
+    }
+
+    public function testPublicKey(): void
+    {
+        $sk = new BigInteger($this->testPublicKeyInput);
+        $pk = $this->ed25519->publickey($sk);
+
+        $this->assertEquals($this->testPublicKeyOutput, $pk);
     }
 
     public function testEncodeInt(): void

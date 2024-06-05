@@ -260,6 +260,15 @@ class Ed25519
     }
 
     /**
+     * Determines the public key from a secret key.
+     */
+    public function publickey(BigInteger $sk): string
+    {
+        return $this->encodePoint($this->scalarmult($this->B, $sk));
+    }
+
+
+    /**
      * Determines if a point is on the Edwards25519 curve.
      */
     public function isoncurve(Point $P): bool
