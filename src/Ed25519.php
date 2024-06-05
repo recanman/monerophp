@@ -287,10 +287,10 @@ class Ed25519
         // Convert to little-endian
         $encoded = strrev(hex2bin($encoded));
 
-        $y = $this->decodeint($encoded);
+        $y = $this->decodeint(substr($encoded, 0, 32));
         $x = $this->xrecover($y);
 
-        if ($x->binaryAnd(new BigInteger("1"))->cmp($this->bit($encoded, $this->b->sub(1))) != 0) {
+        if ($x->binaryAnd(new BigInteger("1"))->toNumber() != $this->bit($encoded, new BigInteger("255"))) {
             $x = $this->q->sub($x);
         }
 
