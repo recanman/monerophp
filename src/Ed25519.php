@@ -183,10 +183,18 @@ class Ed25519
      */
     public function edwards(Point $P, Point $Q): Point
     {
-        $x = self::pymod($P->x->mul($Q->y)->add($Q->x->mul($P->y)), $this->q);
-        $y = self::pymod($P->y->mul($Q->y)->sub($this->d->mul($P->x)->mul($Q->x)), $this->q);
+        $x1 = $P->x;
+        $y1 = $P->y;
+        $x2 = $Q->x;
+        $y2 = $Q->y;
 
-        return new Point($x, $y);
+        $x3 = $x1->mul($y2)->add($x2->mul($y1))->mul($this->inv((new BigInteger("1"))->add($this->d->mul($x1)->mul($x2)->mul($y1)->mul($y2))));
+        $y3 = $y1->mul($y2)->add($x1->mul($x2))->mul($this->inv((new BigInteger("1"))->sub($this->d->mul($x1)->mul($x2)->mul($y1)->mul($y2))));
+
+        $x3 = $x3->mod($this->q);
+        $y3 = $y3->mod($this->q);
+
+        return new Point($x3, $y3);
     }
 
     /**
