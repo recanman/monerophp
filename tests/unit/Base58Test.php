@@ -13,7 +13,7 @@ class Base58Test extends TestCase
     public function testEncode()
     {
         $this->assertSame($this->testEncoded, Base58::encode($this->testDecoded));
-        
+
         $this->expectException(TypeError::class);
         Base58::encode("invalid");
     }

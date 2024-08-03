@@ -39,7 +39,7 @@ class Base58
         while (!$dec->equals(0)) {
             $remainder = $dec->mod(16);
             $dec = $dec->div(16);
-            $res = dechex((int)$remainder->toDec()).$res;
+            $res = dechex((int)$remainder->toDec()) . $res;
         }
 
         return $res;
@@ -58,7 +58,7 @@ class Base58
         $length = count($data);
 
         if ($length < 1 || $length > self::FULL_ENCODED_BLOCK_SIZE) {
-            throw new Exception("Invalid block length: ". $length);
+            throw new Exception("Invalid block length: " . $length);
         }
 
         $num = self::uint8beTo64($data);
@@ -115,7 +115,7 @@ class Base58
         $length = count($data);
 
         if ($length < 1 || $length > self::FULL_ENCODED_BLOCK_SIZE) {
-            throw new Exception("Invalid block length: ". $length);
+            throw new Exception("Invalid block length: " . $length);
         }
 
         $num = new BigInteger(0);
@@ -125,7 +125,7 @@ class Base58
             $char_value = strpos(self::ALPHABET, $char);
 
             if ($char_value === false) {
-                throw new Exception("Invalid character: ". $char);
+                throw new Exception("Invalid character: " . $char);
             }
 
             $num = $num->mul(self::ALPHABET_SIZE)->add($char_value);

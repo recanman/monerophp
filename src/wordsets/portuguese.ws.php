@@ -1674,6 +1674,6 @@ class portuguese implements Wordset
             "zeloso",
             "zenite",
             "zumbi"
-       ];
+        ];
     }
 }

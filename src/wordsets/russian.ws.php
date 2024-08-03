@@ -16,7 +16,6 @@ class russian implements Wordset
     public static function name(): string
     {
         return "русский язык";
-
     }
 
     /**
@@ -1674,6 +1673,6 @@ class russian implements Wordset
             "яхта",
             "ячейка",
             "ящик"
-       ];
+        ];
     }
 }

@@ -16,7 +16,6 @@ class spanish implements Wordset
     public static function name(): string
     {
         return "Español";
-
     }
 
     /**
