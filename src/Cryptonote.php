@@ -57,8 +57,6 @@ class Cryptonote
     ];
     protected $network_prefixes;
 
-    // https://github.com/monero-project/monero/blob/master/src/cryptonote_config.h#L222
-    private $network_prefixes;
     protected $ed25519;
     protected $base58;
     protected $varint;
