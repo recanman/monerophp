@@ -58,8 +58,6 @@ class Cryptonote
     protected $network_prefixes;
 
     protected $ed25519;
-    protected $base58;
-    protected $varint;
 
     public function __construct(MoneroNetwork $network)
     {
@@ -67,49 +65,42 @@ class Cryptonote
         $this->ed25519 = new Ed25519();
     }
 
-    /*
-     * @param string Hex encoded string of the data to hash
-     * @return string Hex encoded string of the hashed data
-     *
+    /**
+     * Hashes a hexadecimal string with Keccak-256.
      */
-    public function keccak_256($message)
+    public static function keccak_256($message): string
     {
-        $message_bin = hex2bin($message);
-        $hash = keccak::hash($message_bin, 256);
+        $bin = new BigInteger($message, 16);
+        $hash = keccak::hash($bin->toBytes(), 256);
 
         return $hash;
     }
 
-    /*
-     * @return string A hex encoded string of 32 random bytes
-     *
+    /**
+     * Generates a new random hexadecimal seed (32 bytes).
      */
-    public function gen_new_hex_seed()
+    public function gen_new_hex_seed(): string
     {
         $bytes = random_bytes(32);
         return bin2hex($bytes);
     }
 
-    public function sc_reduce($input)
+    /**
+     * Performs sc_reduce (mod l) on a hexadecimal string.
+     */
+    public function sc_reduce(string $input): string
     {
-        $integer = $this->ed25519->decodeint(hex2bin($input));
-
-        $modulo = bcmod($integer, $this->ed25519->l);
-
-        $result = bin2hex($this->ed25519->encodeint($modulo));
+        $modulo = new BigInteger($input, 16);
+        $result = $modulo->mod($this->ed25519->l)->toHex();
         return $result;
     }
 
-    /*
-     * Hs in the cryptonote white paper
-     *
-     * @param string Hex encoded data to hash
-     *
-     * @return string A 32 byte encoded integer
+    /**
+     * Hashes a string and reduces it to a scalar.
      */
-    public function hash_to_scalar($data)
+    public function hash_to_scalar(string $data): string
     {
-        $hash = $this->keccak_256($data);
+        $hash = self::keccak_256($data);
         $scalar = $this->sc_reduce($hash);
         return $scalar;
     }
@@ -120,7 +111,7 @@ class Cryptonote
      *
      * @return string A deterministic private view key represented as a 32 byte hex string
      */
-    public function derive_viewKey($spendKey)
+    public function derive_viewKey(string $spendKey): string
     {
         return $this->hash_to_scalar($spendKey);
     }
@@ -132,14 +123,15 @@ class Cryptonote
      *
      * @return array An array containing a private spend key and a deterministic view key
      */
-    public function gen_private_keys($seed)
+    public function gen_private_keys(string $seed): array
     {
         $spendKey = $this->sc_reduce($seed);
         $viewKey = $this->derive_viewKey($spendKey);
-        $result = array("spendKey" => $spendKey,
-                        "viewKey" => $viewKey);
 
-        return $result;
+        return [
+            "spendKey" => $spendKey,
+            "viewKey" => $viewKey
+        ];
     }
 
     /*
@@ -149,11 +141,9 @@ class Cryptonote
      *
      * @return string a 32 byte hex encoding of a point on the curve to be used as a public key
      */
-    public function pk_from_sk($privKey)
+    public function pk_from_sk(string $privKey): string
     {
-        $keyInt = $this->ed25519->decodeint(hex2bin($privKey));
-        $aG = $this->ed25519->scalarmult_base($keyInt);
-        return bin2hex($this->ed25519->encodepoint($aG));
+        return $this->ed25519->publickey($this->ed25519->decodeint($privKey));
     }
 
     /*
@@ -164,57 +154,57 @@ class Cryptonote
      *
      * @return string The hex encoded key derivation
      */
-    public function gen_key_derivation($public, $private)
+    public function gen_key_derivation(string $public, string $private): string
     {
         $point = $this->ed25519->scalarmult($this->ed25519->decodepoint(hex2bin($public)), $this->ed25519->decodeint(hex2bin($private)));
-        $res = $this->ed25519->scalarmult($point, 8);
-        return bin2hex($this->ed25519->encodepoint($res));
+        $res = $this->ed25519->scalarmult($point, new BigInteger(8));
+        return bin2hex($this->ed25519->encodePoint($res));
     }
 
-    public function derivation_to_scalar($der, $index)
+    public function derivation_to_scalar(string $der, int $index): string
     {
-        $encoded = $this->varint->encode_varint($index);
+        $encoded = Varint::encodeVarint($index);
         $data = $der . $encoded;
         return $this->hash_to_scalar($data);
     }
 
     // this is a one way function used for both encrypting and decrypting 8 byte payment IDs
-    public function stealth_payment_id($payment_id, $tx_pub_key, $viewkey)
+    public function stealth_payment_id(string $payment_id, string $tx_pub_key, string $viewkey): string
     {
-        if(strlen($payment_id) != 16) {
+        if (strlen($payment_id) != 16) {
             throw new Exception("Error: Incorrect payment ID size. Should be 8 bytes");
         }
         $der = $this->gen_key_derivation($tx_pub_key, $viewkey);
         $data = $der . '8d';
-        $hash = $this->keccak_256($data);
+        $hash = self::keccak_256($data);
         $key = substr($hash, 0, 16);
         $result = bin2hex(pack('H*', $payment_id) ^ pack('H*', $key));
         return $result;
     }
 
     // takes transaction extra field as hex string and returns transaction public key 'R' as hex string
-    public function txpub_from_extra($extra)
+    public function txpub_from_extra(string $extra): string
     {
         $parsed = array_map("hexdec", str_split($extra, 2));
 
-        if($parsed[0] == 1) {
+        if ($parsed[0] == 1) {
             return substr($extra, 2, 64);
         }
 
-        if($parsed[0] == 2) {
-            if($parsed[0] == 2 || $parsed[2] == 1) {
+        if ($parsed[0] == 2) {
+            if ($parsed[0] == 2 || $parsed[2] == 1) {
                 //$offset = (($parsed[1] + 2) *2) + 2;
                 return substr($extra, (($parsed[1] + 2) * 2) + 2, 64);
             }
         }
     }
 
-    public function derive_public_key($der, $index, $pub)
+    public function derive_public_key(string $der, int $index, string $pub): string
     {
         $scalar = $this->derivation_to_scalar($der, $index);
         $sG = $this->ed25519->scalarmult_base($this->ed25519->decodeint(hex2bin($scalar)));
         $pubPoint = $this->ed25519->decodepoint(hex2bin($pub));
-        $key = $this->ed25519->encodepoint($this->ed25519->edwards($pubPoint, $sG));
+        $key = $this->ed25519->encodePoint($this->ed25519->edwards($pubPoint, $sG));
         return bin2hex($key);
     }
 
@@ -227,12 +217,12 @@ class Cryptonote
      * @param int output index
      * @param string output you want to check against P
      */
-    public function is_output_mine($txPublic, $privViewkey, $publicSpendkey, $index, $P)
+    public function is_output_mine(string $txPublic, string $privViewkey, string $publicSpendkey, int $index, string $P): bool
     {
         $derivation = $this->gen_key_derivation($txPublic, $privViewkey);
         $Pprime = $this->derive_public_key($derivation, $index, $publicSpendkey);
 
-        if($P == $Pprime) {
+        if ($P == $Pprime) {
             return true;
         } else {
             return false;
@@ -247,20 +237,20 @@ class Cryptonote
      *
      * @return string Base58 encoded Monero address
      */
-    public function encode_address($pSpendKey, $pViewKey)
+    public function encode_address(string $pSpendKey, string $pViewKey): string
     {
         $data = $this->network_prefixes["STANDARD"] . $pSpendKey . $pViewKey;
-        $checksum = $this->keccak_256($data);
+        $checksum = self::keccak_256($data);
         $encoded  = Base58::encode($data . substr($checksum, 0, 8));
 
         return $encoded;
     }
 
-    public function verify_checksum($address)
+    public function verify_checksum(string $address): bool
     {
         $decoded = Base58::decode($address);
         $checksum = substr($decoded, -8);
-        $checksum_hash = $this->keccak_256(substr($decoded, 0, -8));
+        $checksum_hash = self::keccak_256(substr($decoded, 0, -8));
         $calculated = substr($checksum_hash, 0, 8);
         return $checksum === $calculated;
     }
@@ -272,11 +262,11 @@ class Cryptonote
          *
          * @return array An array containing the Address network byte, public spend key, and public view key
          */
-    public function decode_address($address)
+    public function decode_address(string $address): array
     {
         $decoded = Base58::decode($address);
 
-        if(!$this->verify_checksum($address)) {
+        if (!$this->verify_checksum($address)) {
             throw new Exception("Error: invalid checksum");
         }
 
@@ -284,9 +274,11 @@ class Cryptonote
         $public_spendKey = substr($decoded, 2, 64);
         $public_viewKey = substr($decoded, 66, 64);
 
-        $result = array("networkByte" => $network_byte,
-                "spendKey" => $public_spendKey,
-                "viewKey" => $public_viewKey);
+        $result = array(
+            "networkByte" => $network_byte,
+            "spendKey" => $public_spendKey,
+            "viewKey" => $public_viewKey
+        );
         return $result;
     }
 
@@ -297,11 +289,11 @@ class Cryptonote
      * @param string A 32 byte hex encoded public view key
      * @param string An 8 byte hex string to use as a payment id
      */
-    public function integrated_addr_from_keys($public_spendkey, $public_viewkey, $payment_id)
+    public function integrated_addr_from_keys(string $public_spendkey, string $public_viewkey, string $payment_id): string
     {
-        $data = $this->network_prefixes["INTEGRATED"].$public_spendkey.$public_viewkey.$payment_id;
-        $checksum = substr($this->keccak_256($data), 0, 8);
-        $result = Base58::encode($data.$checksum);
+        $data = $this->network_prefixes["INTEGRATED"] . $public_spendkey . $public_viewkey . $payment_id;
+        $checksum = substr(self::keccak_256($data), 0, 8);
+        $result = Base58::encode($data . $checksum);
         return $result;
     }
 
@@ -312,7 +304,7 @@ class Cryptonote
      *
      * @return string A base58 encoded Monero address
      */
-    public function address_from_seed($hex_seed)
+    public function address_from_seed(string $hex_seed): string
     {
         $private_keys = $this->gen_private_keys($hex_seed);
         $private_viewKey = $private_keys["viewKey"];
@@ -326,58 +318,57 @@ class Cryptonote
     }
 
     // m = Hs(a || i)
-    public function generate_subaddr_secret_key($major_index, $minor_index, $sec_key)
+    public function generate_subaddr_secret_key(string $sec_key, int $major_index, int $minor_index): string
     {
         $prefix = "5375624164647200";
         $index = pack("II", $major_index, $minor_index);
         return $this->hash_to_scalar($prefix . $sec_key . bin2hex($index));
     }
 
-    public function generate_subaddress_spend_public_key($spend_public_key, $subaddr_secret_key)
+    public function generate_subaddress_spend_public_key(string $spend_public_key, string $subaddr_secret_key): string
     {
         $mInt = $this->ed25519->decodeint(hex2bin($subaddr_secret_key));
         $mG = $this->ed25519->scalarmult_base($mInt);
         $D = $this->ed25519->edwards($this->ed25519->decodepoint(hex2bin($spend_public_key)), $mG);
-        return bin2hex($this->ed25519->encodepoint($D));
+        return bin2hex($this->ed25519->encodePoint($D));
     }
 
-    public function generate_subaddr_view_public_key($subaddr_spend_public_key, $view_secret_key)
+    public function generate_subaddr_view_public_key(string $subaddr_spend_public_key, string $view_secret_key): string
     {
         $point = $this->ed25519->scalarmult($this->ed25519->decodepoint(hex2bin($subaddr_spend_public_key)), $this->ed25519->decodeint(hex2bin($view_secret_key)));
-        return bin2hex($this->ed25519->encodepoint($point));
+        return bin2hex($this->ed25519->encodePoint($point));
     }
 
-    public function generate_subaddress($major_index, $minor_index, $view_secret_key, $spend_public_key)
+    public function generate_subaddress(string $spend_public_key, string $view_secret_key, string $major_index, int $minor_index): string
     {
         $subaddr_secret_key = $this->generate_subaddr_secret_key($major_index, $minor_index, $view_secret_key);
         $subaddr_public_spend_key = $this->generate_subaddress_spend_public_key($spend_public_key, $subaddr_secret_key);
         $subaddr_public_view_key = $this->generate_subaddr_view_public_key($subaddr_public_spend_key, $view_secret_key);
         $data = $this->network_prefixes["SUBADDRESS"] . $subaddr_public_spend_key . $subaddr_public_view_key;
-        $checksum = $this->keccak_256($data);
+        $checksum = self::keccak_256($data);
         $encoded = Base58::encode($data . substr($checksum, 0, 8));
         return $encoded;
     }
 
-    public function deserialize_block_header($block)
+    public function deserialize_block_header(string $block): array
     {
         $data = str_split($block, 2);
 
-        $major_version = $this->varint->decode_varint($data);
-        $data = $this->varint->pop_varint($data);
+        $major_version = Varint::decodeVarint($data);
+        $data = array_slice($data, 1);
 
-        $minor_version = $this->varint->decode_varint($data);
-        $data = $this->varint->pop_varint($data);
+        $minor_version = Varint::decodeVarint($data);
+        $data = array_slice($data, 1);
 
-        $timestamp = $this->varint->decode_varint($data);
-        $data = $this->varint->pop_varint($data);
+        $timestamp = Varint::decodeVarint($data);
+        $data = array_slice($data, 1);
 
-        $nonce = $this->varint->decode_varint($data);
-        $data = $this->varint->pop_varint($data);
-
-        return array("major_version" => $major_version,
-                     "minor_version" => $minor_version,
-                     "timestamp" => $timestamp,
-                     "nonce" => $nonce);
+        $nonce = Varint::decodeVarint($data);
+        return [
+            "major_version" => $major_version,
+            "minor_version" => $minor_version,
+            "timestamp" => $timestamp,
+            "nonce" => $nonce
+        ];
     }
-
 }
